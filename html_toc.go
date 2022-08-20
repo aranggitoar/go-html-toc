@@ -1,19 +1,18 @@
-// Extracts relevant table of contents data out of your HTML markup.
-// Takes all the heading and outputs a string in JSON format of the
-// relevant data (level, content and slug).
-//
-// NOTE: It doesn't handle headings that contains other tags correctly.
+// Extracts relevant table of contents data out of your HTML markup and add
+// permalinks to your markup's headings.
+// Takes your HTML markup, outputs a string in JSON format of the relevant
+// data (level, content and slug) and inserts permalinks to the markup's
+// headings.
 
 package html_toc
 
 import (
-	"log"
 	"regexp"
 	"strings"
 )
 
 // CreateTOC creates a table of contents out of the content.
-func CreateTOC(s string) string {
+func CreateTOC(s string) (string, string) {
 	// Workaround for single line HTML markup.
 	// Appends newline on every closing tag.
 	reg := regexp.MustCompile("(</[^ ][^<]*>)")
@@ -23,9 +22,11 @@ func CreateTOC(s string) string {
 	reg = regexp.MustCompile("\n(</h[1-6][^<]*>)")
 	s = reg.ReplaceAllString(s, "$1")
 
-	// The following regex will match every heading and its contents.
-	// It doesn't handle headings that contains other elements.
-	reg = regexp.MustCompile(`<h([1-6])?.*>(.*)</h[1-6]>`)
+	s = InsertAnchorTag(s)
+
+	// The following regex will match every heading, the anchor tags inside
+	// it and the actual content.
+	reg = regexp.MustCompile(`<h([1-6])?.*><a?.*>(.*)</a></h[1-6]>`)
 
 	matches := reg.FindAllStringSubmatch(s, -1)
 
@@ -55,17 +56,18 @@ func CreateTOC(s string) string {
 	}
 	toc += "]"
 
-	return toc
+	// Remove all newlines.
+	reg = regexp.MustCompile("\n")
+	s = reg.ReplaceAllString(s, "")
+
+	return toc, s
 }
 
-// createSlug creates slug out of a title.
+// CreateSlug creates slug out of a title.
 func CreateSlug(s string) string {
 	// Remove all characters except for word characters, digits and white
 	// space.
-	reg, err := regexp.Compile("[^a-zA-Z0-9 ]+")
-	if err != nil {
-		log.Fatal(err)
-	}
+	reg := regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
 	tmp := reg.ReplaceAllString(s, "")
 
 	// Make all characters lowercase and replace white space with a hyphen
@@ -73,10 +75,30 @@ func CreateSlug(s string) string {
 	return tmp
 }
 
+// InsertAnchorTag inserts an anchor tag inside a heading.
+func InsertAnchorTag(s string) string {
+	// Get all headings and capture the opening tag, content and closing
+	// tag.
+	reg := regexp.MustCompile(`(<h[1-6]?.*>)(.*)(</h[1-6]>)`)
+	matches := reg.FindAllStringSubmatch(s, -1)
+
+	// Insert the anchor tag between the captured parts from all of the
+	// headings.
+	for _, v := range matches {
+		slug := CreateSlug(v[2])
+
+		reg := regexp.MustCompile(v[1] + v[2] + v[3])
+
+		s = reg.ReplaceAllString(s, v[1]+"<a href=\"#"+slug+"\" title=\"Permalink to "+v[2]+"\">"+v[2]+"</a>"+v[3])
+	}
+
+	return s
+}
+
 /*
 
 Go HTML TOC extracts relevant table of contents data out of your HTML
-markup.
+markup and add permalinks to your markup's headings.
 Copyright (C) 2022  Aranggi J. Toar
 
 This program is free software; you can redistribute it and/or modify

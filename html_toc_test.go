@@ -15,17 +15,25 @@ func TestCreateTOC(t *testing.T) {
 
 	// Taken from
 	// https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML
-	html, err := ioutil.ReadFile("./test.html")
+	rawHTML, err := ioutil.ReadFile("./raw.html")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	json, err := ioutil.ReadFile("./test.json")
+	desiredJSON, err := ioutil.ReadFile("./result.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	is.Equal(string(json), ht.CreateTOC(string(html)))
+	desiredHTML, err := ioutil.ReadFile("./result.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	resJSON, resHTML := ht.CreateTOC(string(rawHTML))
+
+	is.Equal(string(desiredJSON), resJSON)
+	is.Equal(string(desiredHTML), resHTML)
 }
 
 func TestCreateSlug(t *testing.T) {
