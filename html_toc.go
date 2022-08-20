@@ -1,6 +1,6 @@
 // Extracts relevant table of contents data out of your HTML markup.
-// Takes all the heading and outputs a JSON of the relevant data (level,
-// content and slug).
+// Takes all the heading and outputs a string in JSON format of the
+// relevant data (level, content and slug).
 //
 // NOTE: It doesn't handle headings that contains other tags correctly.
 
@@ -23,19 +23,19 @@ func CreateTOC(s string) string {
 	// Create a JSON out of the found heading with the following schema:
 	// {
 	//   {
-	//     "lvl": 1,
+	//     "level": 1,
 	//     "content": "Text",
 	//     "slug": "text",
 	//   },
 	//   {
-	//     "lvl": 2,
+	//     "level": 2,
 	//     "content": "Text",
 	//     "slug": "text",
 	//   },
 	// }
 	var toc = "{"
 	for _, v := range matches {
-		toc += "{\"" + "lvl\":" + v[1] + ","
+		toc += "{\"" + "level\":" + v[1] + ","
 		toc += "\"" + "content\":\"" + v[2] + "\","
 		toc += "\"" + "slug\":\"" + CreateSlug(v[2]) + "\",},"
 	}
