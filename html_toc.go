@@ -42,13 +42,18 @@ func CreateTOC(s string) string {
 	//     "slug": "text",
 	//   },
 	// }
-	var toc = "{"
-	for _, v := range matches {
+	var toc = "["
+	for i, v := range matches {
 		toc += "{\"" + "level\":" + v[1] + ","
 		toc += "\"" + "content\":\"" + v[2] + "\","
-		toc += "\"" + "slug\":\"" + CreateSlug(v[2]) + "\",},"
+		if len(matches) == i+1 {
+			toc += "\"" + "slug\":\"" + CreateSlug(v[2]) + "\"}"
+		}
+		if len(matches) > i+1 {
+			toc += "\"" + "slug\":\"" + CreateSlug(v[2]) + "\"},"
+		}
 	}
-	toc += "}"
+	toc += "]"
 
 	return toc
 }
