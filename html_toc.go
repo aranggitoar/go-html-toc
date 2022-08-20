@@ -14,9 +14,18 @@ import (
 
 // CreateTOC creates a table of contents out of the content.
 func CreateTOC(s string) string {
+	// Workaround for single line HTML markup.
+	// Appends newline on every closing tag.
+	reg := regexp.MustCompile("(</[^ ][^<]*>)")
+	s = reg.ReplaceAllString(s, "$1\n")
+
+	// Deletes newline after every heading closing tag.
+	reg = regexp.MustCompile("\n(</h[1-6][^<]*>)")
+	s = reg.ReplaceAllString(s, "$1")
+
 	// The following regex will match every heading and its contents.
 	// It doesn't handle headings that contains other elements.
-	reg := regexp.MustCompile(`<h([1-6])?.*>(.*)</h[1-6]>`)
+	reg = regexp.MustCompile(`<h([1-6])?.*>(.*)</h[1-6]>`)
 
 	matches := reg.FindAllStringSubmatch(s, -1)
 
