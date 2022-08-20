@@ -11,14 +11,16 @@ import (
 	"strings"
 )
 
-// CreateTOC creates a table of contents out of the content.
+// TODO: Separate the
+// CreateTOC creates a table of contents out of the markup and a markup
+// with permalink on the headings.
+// Returns the table of contents in a JSON format and the edited markup.
 func CreateTOC(s string) (string, string) {
 	// Workaround for single line HTML markup.
 	// Appends newline on every closing tag.
+	// Deletes newline after every heading closing tag.
 	reg := regexp.MustCompile("(</[^ ][^<]*>)")
 	s = reg.ReplaceAllString(s, "$1\n")
-
-	// Deletes newline after every heading closing tag.
 	reg = regexp.MustCompile("\n(</h[1-6][^<]*>)")
 	s = reg.ReplaceAllString(s, "$1")
 
@@ -75,15 +77,15 @@ func CreateSamePageSlug(s string) string {
 	return tmp
 }
 
-// InsertAnchorTag inserts an anchor tag inside a heading.
+// TODO: Test.
+// InsertAnchorTag inserts anchor tags inside a heading.
 func InsertAnchorTag(s string) string {
 	// Get all headings and capture the opening tag, content and closing
 	// tag.
 	reg := regexp.MustCompile(`(<h[1-6]?.*>)(.*)(</h[1-6]>)`)
 	matches := reg.FindAllStringSubmatch(s, -1)
 
-	// Insert the anchor tag between the captured parts from all of the
-	// headings.
+	// Insert the anchor tag between the captured parts from all headings.
 	for _, v := range matches {
 		slug := CreateSamePageSlug(v[2])
 
@@ -91,6 +93,24 @@ func InsertAnchorTag(s string) string {
 
 		s = reg.ReplaceAllString(s, v[1][:3]+" id=\""+slug+"\""+v[1][3:]+"<a href=\"#"+slug+"\" title=\"Permalink to "+v[2]+"\">"+v[2]+"</a>"+v[3])
 	}
+
+	return s
+}
+
+// TODO: Test.
+// RemoveAnchorTag removes anchor tags inside a heading.
+func RemoveAnchorTag(s string) string {
+	// Workaround for single line HTML markup.
+	// Appends newline on every closing tag.
+	// Deletes newline after every heading closing tag.
+	reg := regexp.MustCompile("(</[^ ][^<]*>)")
+	s = reg.ReplaceAllString(s, "$1\n")
+	reg = regexp.MustCompile("\n(</h[1-6][^<]*>)")
+	s = reg.ReplaceAllString(s, "$1")
+
+	// Remove the anchor tags from all headings.
+	reg = regexp.MustCompile(`(<h[1-6]?.*>)<a?.*>(.*)</a>(</h[1-6]>)`)
+	s = reg.ReplaceAllString(s, "$1$2$3")
 
 	return s
 }
