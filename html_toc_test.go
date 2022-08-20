@@ -36,14 +36,14 @@ func TestCreateTOC(t *testing.T) {
 	is.Equal(string(desiredHTML), resHTML)
 }
 
-func TestCreateSlug(t *testing.T) {
+func TestCreateSamePageSlug(t *testing.T) {
 	is := is.New(t)
 
-	testStringOne := ht.CreateSlug("Looking to become a front-end web developer?")
-	testStringTwo := ht.CreateSlug("Introduction to HTML")
+	testStringOne := ht.CreateSamePageSlug("Looking to become a front-end web developer?")
+	testStringTwo := ht.CreateSamePageSlug("Introduction to HTML")
 
-	is.Equal("looking-to-become-a-frontend-web-developer", testStringOne)
-	is.Equal("introduction-to-html", testStringTwo)
+	is.Equal("looking_to_become_a_frontend_web_developer", testStringOne)
+	is.Equal("introduction_to_html", testStringTwo)
 }
 
 /*

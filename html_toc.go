@@ -48,10 +48,10 @@ func CreateTOC(s string) (string, string) {
 		toc += "{\"" + "level\":" + v[1] + ","
 		toc += "\"" + "content\":\"" + v[2] + "\","
 		if len(matches) == i+1 {
-			toc += "\"" + "slug\":\"" + CreateSlug(v[2]) + "\"}"
+			toc += "\"" + "slug\":\"" + CreateSamePageSlug(v[2]) + "\"}"
 		}
 		if len(matches) > i+1 {
-			toc += "\"" + "slug\":\"" + CreateSlug(v[2]) + "\"},"
+			toc += "\"" + "slug\":\"" + CreateSamePageSlug(v[2]) + "\"},"
 		}
 	}
 	toc += "]"
@@ -63,15 +63,15 @@ func CreateTOC(s string) (string, string) {
 	return toc, s
 }
 
-// CreateSlug creates slug out of a title.
-func CreateSlug(s string) string {
+// CreateSamePageSlug creates slug out of a title.
+func CreateSamePageSlug(s string) string {
 	// Remove all characters except for word characters, digits and white
 	// space.
 	reg := regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
 	tmp := reg.ReplaceAllString(s, "")
 
 	// Make all characters lowercase and replace white space with a hyphen
-	tmp = strings.Replace(strings.ToLower(tmp), " ", "-", -1)
+	tmp = strings.Replace(strings.ToLower(tmp), " ", "_", -1)
 	return tmp
 }
 
@@ -85,7 +85,7 @@ func InsertAnchorTag(s string) string {
 	// Insert the anchor tag between the captured parts from all of the
 	// headings.
 	for _, v := range matches {
-		slug := CreateSlug(v[2])
+		slug := CreateSamePageSlug(v[2])
 
 		reg := regexp.MustCompile(v[1] + v[2] + v[3])
 
