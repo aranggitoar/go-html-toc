@@ -88,7 +88,14 @@ func InsertAnchorTag(s string) string {
 	for _, v := range matches {
 		slug := CreateSamePageSlug(v[2])
 
-		reg := regexp.MustCompile(v[1] + v[2] + v[3])
+		// Escape possible title characters that's a special character in
+		// Regular Expression.
+		reg := regexp.MustCompile(`\?`)
+		v[2] = reg.ReplaceAllString(v[2], `\?`)
+		reg = regexp.MustCompile(`\!`)
+		v[2] = reg.ReplaceAllString(v[2], `\!`)
+
+		reg = regexp.MustCompile(v[1] + v[2] + v[3])
 
 		s = reg.ReplaceAllString(s, v[1][:3]+" id=\""+slug+"\""+v[1][3:]+"<a href=\"#"+slug+"\" title=\"Permalink to "+v[2]+"\">"+v[2]+"</a>"+v[3])
 	}
