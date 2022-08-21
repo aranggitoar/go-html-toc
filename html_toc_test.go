@@ -13,37 +13,58 @@ import (
 func TestCreateTOC(t *testing.T) {
 	is := is.New(t)
 
-	// Taken from
-	// https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML
 	rawHTML, err := ioutil.ReadFile("./raw.html")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	desiredJSON, err := ioutil.ReadFile("./result.json")
+	exJSON, err := ioutil.ReadFile("./result.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	desiredHTML, err := ioutil.ReadFile("./result.html")
+	exHTML, err := ioutil.ReadFile("./result.html")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	resJSON, resHTML := ht.CreateTOC(string(rawHTML))
 
-	is.Equal(string(desiredJSON), resJSON)
-	is.Equal(string(desiredHTML), resHTML)
+	is.Equal(string(exJSON), resJSON)
+	is.Equal(string(exHTML), resHTML)
 }
 
 func TestCreateSamePageSlug(t *testing.T) {
 	is := is.New(t)
 
-	testStringOne := ht.CreateSamePageSlug("Looking to become a front-end web developer?")
-	testStringTwo := ht.CreateSamePageSlug("Introduction to HTML")
+	resA := ht.CreateSamePageSlug("Looking to become a front-end web developer?")
+	resB := ht.CreateSamePageSlug("Introduction to HTML")
 
-	is.Equal("looking_to_become_a_frontend_web_developer", testStringOne)
-	is.Equal("introduction_to_html", testStringTwo)
+	exA := "looking_to_become_a_frontend_web_developer"
+	exB := "introduction_to_html"
+
+	is.Equal(exA, resA)
+	is.Equal(exB, resB)
+}
+
+func TestInsertAnchorTag(t *testing.T) {
+	is := is.New(t)
+
+	res := ht.InsertAnchorTag(`<h2>Teknis Pelaksanaan</h2>`)
+
+	ex := `<h2 id="teknis_pelaksanaan"><a href="#teknis_pelaksanaan" title="Permalink to Teknis Pelaksanaan">Teknis Pelaksanaan</a></h2>`
+
+	is.Equal(ex, res)
+}
+
+func TestRemoveAnchorTag(t *testing.T) {
+	is := is.New(t)
+
+	res := ht.RemoveAnchorTag(`<h2 id="teknis_pelaksanaan"><a href="#teknis_pelaksanaan" title="Permalink to Teknis Pelaksanaan">Teknis Pelaksanaan</a></h2>`)
+
+	ex := `<h2>Teknis Pelaksanaan</h2>`
+
+	is.Equal(ex, res)
 }
 
 /*

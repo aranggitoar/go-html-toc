@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// TODO: Separate the
+// TODO: Separate the anchor tag (for permalink) insertion logic.
 // CreateTOC creates a table of contents out of the markup and a markup
 // with permalink on the headings.
 // Returns the table of contents in a JSON format and the edited markup.
@@ -77,7 +77,6 @@ func CreateSamePageSlug(s string) string {
 	return tmp
 }
 
-// TODO: Test.
 // InsertAnchorTag inserts anchor tags inside a heading.
 func InsertAnchorTag(s string) string {
 	// Get all headings and capture the opening tag, content and closing
@@ -97,7 +96,6 @@ func InsertAnchorTag(s string) string {
 	return s
 }
 
-// TODO: Test.
 // RemoveAnchorTag removes anchor tags inside a heading.
 func RemoveAnchorTag(s string) string {
 	// Workaround for single line HTML markup.
@@ -111,6 +109,14 @@ func RemoveAnchorTag(s string) string {
 	// Remove the anchor tags from all headings.
 	reg = regexp.MustCompile(`(<h[1-6]?.*>)<a?.*>(.*)</a>(</h[1-6]>)`)
 	s = reg.ReplaceAllString(s, "$1$2$3")
+
+	// Remove the ids from all opening heading tag.
+	reg = regexp.MustCompile(`<h([1-6])[^<]*>`)
+	s = reg.ReplaceAllString(s, "<h$1>")
+
+	// Remove all newlines.
+	reg = regexp.MustCompile("\n")
+	s = reg.ReplaceAllString(s, "")
 
 	return s
 }
